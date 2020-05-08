@@ -1,0 +1,566 @@
+openapi: 3.0.0
+info:
+  title: Node.js Sign-up and Verification API
+  description: Node.js + MongoDB - API with email sign-up, verification, authentication and forgot password
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:4000
+    description: Local development server
+
+paths:
+  /accounts/authenticate:
+    post:
+      summary: Authenticate a user account and return a JWT token
+      description: Accounts must be verified before authenticating.
+      operationId: authenticate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "jason@example.com"
+                password:
+                  type: string
+                  example: "pass123"
+              required:
+                - email
+                - password
+      responses:
+        "200":
+          description: Account details and a JWT authentication `token`
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "5eb12e197e06a76ccdefc121"
+                  title:
+                    type: string
+                    example: "Mr"
+                  firstName:
+                    type: string
+                    example: "Jason"
+                  lastName:
+                    type: string
+                    example: "Watmore"
+                  email:
+                    type: string
+                    example: "jason@example.com"
+                  role:
+                    type: string
+                    example: "Admin"
+                  dateCreated:
+                    type: string
+                    example: "2020-05-05T09:12:57.848Z"
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWIxMmUxOTdlMDZhNzZjY2RlZmMxMjEiLCJpZCI6IjVlYjEyZTE5N2UwNmE3NmNjZGVmYzEyMSIsImlhdCI6MTU4ODc1ODE1N30.xR9H0STbFOpSkuGA9jHNZOJ6eS7umHHqKRhI807YT1Y"
+        "400":
+          description: The email or password is incorrect
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Email or password is incorrect"
+  /accounts/register:
+    post:
+      summary: Register a new user account and send a verification email
+      description: The first account registered in the system is assigned the `Admin` role, other accounts are assigned the `User` role.
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "Mr"
+                firstName:
+                  type: string
+                  example: "Jason"
+                lastName:
+                  type: string
+                  example: "Watmore"
+                email:
+                  type: string
+                  example: "jason@example.com"
+                password:
+                  type: string
+                  example: "pass123"
+                confirmPassword:
+                  type: string
+                  example: "pass123"
+                acceptTerms:
+                  type: boolean
+              required:
+                - title
+                - firstName
+                - lastName
+                - email
+                - password
+                - confirmPassword
+                - acceptTerms
+      responses:
+        "200":
+          description: The registration request was successful and a verification email has been sent to the specified email address
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Registration successful, please check your email for verification instructions"
+  /accounts/verify-email:
+    post:
+      summary: Verify a new account with a verification token received by email after registration
+      operationId: verifyEmail
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  example: "3c7f8d9c4cb348ff95a0b74a1452aa24fc9611bb76768bb9eafeeb826ddae2935f1880bc7713318f"
+              required:
+                - token
+      responses:
+        "200":
+          description: Verification was successful so you can now login to the account
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Verification successful, you can now login"
+        "400":
+          description: Verification failed due to an invalid token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Verification failed"
+  /accounts/forgot-password:
+    post:
+      summary: Submit email address to reset the password on an account
+      operationId: forgotPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "jason@example.com"
+              required:
+                - email
+      responses:
+        "200":
+          description: The request was received and an email has been sent to the specified address with password reset instructions (if the email address is associated with an account)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Please check your email for password reset instructions"
+  /accounts/validate-reset-token:
+    post:
+      summary: Validate the reset password token received by email after submitting to the /accounts/forgot-password route
+      operationId: validateResetToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  example: "3c7f8d9c4cb348ff95a0b74a1452aa24fc9611bb76768bb9eafeeb826ddae2935f1880bc7713318f"
+              required:
+                - token
+      responses:
+        "200":
+          description: Token is valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Token is valid"
+        "400":
+          description: Token is invalid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid token"
+  /accounts/reset-password:
+    post:
+      summary: Reset the password for an account
+      operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  example: "3c7f8d9c4cb348ff95a0b74a1452aa24fc9611bb76768bb9eafeeb826ddae2935f1880bc7713318f"
+                password:
+                  type: string
+                  example: "newPass123"
+                confirmPassword:
+                  type: string
+                  example: "newPass123"
+              required:
+                - token
+                - password
+                - confirmPassword
+      responses:
+        "200":
+          description: Password reset was successful so you can now login to the account with the new password
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Password reset successful, you can now login"
+        "400":
+          description: Password reset failed due to an invalid token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid token"
+  /accounts:
+    get:
+      summary: Get a list of all accounts
+      description: Restricted to admin users.
+      operationId: getAllAccounts
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: An array of all accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: "5eb12e197e06a76ccdefc121"
+                    title:
+                      type: string
+                      example: "Mr"
+                    firstName:
+                      type: string
+                      example: "Jason"
+                    lastName:
+                      type: string
+                      example: "Watmore"
+                    email:
+                      type: string
+                      example: "jason@example.com"
+                    role:
+                      type: string
+                      example: "Admin"
+                    dateCreated:
+                      type: string
+                      example: "2020-05-05T09:12:57.848Z"
+                    dateUpdated:
+                      type: string
+                      example: "2020-05-08T03:11:21.553Z"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    post:
+      summary: Create a new account
+      description: Restricted to admin users.
+      operationId: createAccount
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "Mr"
+                firstName:
+                  type: string
+                  example: "Jason"
+                lastName:
+                  type: string
+                  example: "Watmore"
+                email:
+                  type: string
+                  example: "jason@example.com"
+                password:
+                  type: string
+                  example: "pass123"
+                confirmPassword:
+                  type: string
+                  example: "pass123"
+                role:
+                  type: string
+                  enum: [Admin, User]
+              required:
+                - title
+                - firstName
+                - lastName
+                - email
+                - password
+                - confirmPassword
+                - role
+      responses:
+        "200":
+          description: Account created successfully, verification is not required for accounts created with this endpoint. The details of the new account are returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "5eb12e197e06a76ccdefc121"
+                  title:
+                    type: string
+                    example: "Mr"
+                  firstName:
+                    type: string
+                    example: "Jason"
+                  lastName:
+                    type: string
+                    example: "Watmore"
+                  email:
+                    type: string
+                    example: "jason@example.com"
+                  role:
+                    type: string
+                    example: "Admin"
+                  dateCreated:
+                    type: string
+                    example: "2020-05-05T09:12:57.848Z"
+        "400":
+          description: Email is already registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Email 'jason@example.com' is already registered"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+  /accounts/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: Account id
+        required: true
+        type: string
+        example: "5eb12e197e06a76ccdefc121"
+    get:
+      summary: Get a single account by id
+      description: Admin users can access any account, regular users are restricted to their own account.
+      operationId: getAccountById
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Details of the specified account
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "5eb12e197e06a76ccdefc121"
+                  title:
+                    type: string
+                    example: "Mr"
+                  firstName:
+                    type: string
+                    example: "Jason"
+                  lastName:
+                    type: string
+                    example: "Watmore"
+                  email:
+                    type: string
+                    example: "jason@example.com"
+                  role:
+                    type: string
+                    example: "Admin"
+                  dateCreated:
+                    type: string
+                    example: "2020-05-05T09:12:57.848Z"
+                  dateUpdated:
+                    type: string
+                    example: "2020-05-08T03:11:21.553Z"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    put:
+      summary: Update an account
+      description: Admin users can update any account including role, regular users are restricted to their own account and cannot update role.
+      operationId: updateAccount
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "Mr"
+                firstName:
+                  type: string
+                  example: "Jason"
+                lastName:
+                  type: string
+                  example: "Watmore"
+                email:
+                  type: string
+                  example: "jason@example.com"
+                password:
+                  type: string
+                  example: "pass123"
+                confirmPassword:
+                  type: string
+                  example: "pass123"
+                role:
+                  type: string
+                  enum: [Admin, User]
+      responses:
+        "200":
+          description: Account updated successfully. The details of the updated account are returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "5eb12e197e06a76ccdefc121"
+                  title:
+                    type: string
+                    example: "Mr"
+                  firstName:
+                    type: string
+                    example: "Jason"
+                  lastName:
+                    type: string
+                    example: "Watmore"
+                  email:
+                    type: string
+                    example: "jason@example.com"
+                  role:
+                    type: string
+                    example: "Admin"
+                  dateCreated:
+                    type: string
+                    example: "2020-05-05T09:12:57.848Z"
+                  dateUpdated:
+                    type: string
+                    example: "2020-05-08T03:11:21.553Z"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    delete:
+      summary: Delete an account
+      description: Admin users can delete any account, regular users are restricted to their own account.
+      operationId: deleteAccount
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Account deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Account deleted successfully"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid, or the user does not have access to perform the action
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Invalid Token"
+    NotFoundError:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Not Found"

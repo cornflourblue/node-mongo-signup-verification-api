@@ -12,6 +12,7 @@
         "start-dev": "nodemon ./server.js"
     },
     "dependencies": {
+        "@hapi/joi": "^17.1.1",
         "bcryptjs": "^2.4.3",
         "body-parser": "^1.19.0",
         "cors": "^2.8.5",
@@ -21,7 +22,9 @@
         "mongodb": "^3.5.7",
         "mongoose": "^5.9.11",
         "nodemailer": "^6.4.6",
-        "rootpath": "^0.1.2"
+        "rootpath": "^0.1.2",
+        "swagger-ui-express": "^4.1.4",
+        "yamljs": "^0.3.0"
     },
     "devDependencies": {
         "nodemon": "^2.0.3"

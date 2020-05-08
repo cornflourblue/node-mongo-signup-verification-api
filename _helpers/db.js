@@ -5,5 +5,10 @@ mongoose.connect(process.env.MONGODB_URI || config.connectionString, connectionO
 mongoose.Promise = global.Promise;
 
 module.exports = {
-    Account: require('../accounts/account.model')
+    Account: require('../accounts/account.model'),
+    isValidId
 };
+
+function isValidId(id) {
+    return mongoose.Types.ObjectId.isValid(id);
+}
