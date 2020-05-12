@@ -401,8 +401,9 @@ paths:
         name: id
         description: Account id
         required: true
-        type: string
         example: "5eb12e197e06a76ccdefc121"
+        schema:
+          type: string
     get:
       summary: Get a single account by id
       description: Admin users can access any account, regular users are restricted to their own account.
