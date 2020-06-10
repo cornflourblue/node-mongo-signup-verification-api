@@ -11,7 +11,7 @@ servers:
 paths:
   /accounts/authenticate:
     post:
-      summary: Authenticate a user account and return a JWT token
+      summary: Authenticate account credentials and return a JWT token and a cookie with a refresh token
       description: Accounts must be verified before authenticating.
       operationId: authenticate
       requestBody:
@@ -32,7 +32,13 @@ paths:
                 - password
       responses:
         "200":
-          description: Account details and a JWT authentication `token`
+          description: Account details, a JWT access token and a refresh token cookie
+          headers:
+            Set-Cookie:
+              description: "`refreshToken`"
+              schema:
+                type: string
+                example: refreshToken=51872eca5efedcf424db4cf5afd16a9d00ad25b743a034c9c221afc85d18dcd5e4ad6e3f08607550; Path=/; Expires=Tue, 16 Jun 2020 09:14:17 GMT; HttpOnly
           content:
             application/json:
               schema:
@@ -56,10 +62,13 @@ paths:
                   role:
                     type: string
                     example: "Admin"
-                  dateCreated:
+                  created:
                     type: string
                     example: "2020-05-05T09:12:57.848Z"
-                  token:
+                  isVerified:
+                    type: boolean
+                    example: true
+                  jwtToken:
                     type: string
                     example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWIxMmUxOTdlMDZhNzZjY2RlZmMxMjEiLCJpZCI6IjVlYjEyZTE5N2UwNmE3NmNjZGVmYzEyMSIsImlhdCI6MTU4ODc1ODE1N30.xR9H0STbFOpSkuGA9jHNZOJ6eS7umHHqKRhI807YT1Y"
         "400":
@@ -72,6 +81,115 @@ paths:
                   message:
                     type: string
                     example: "Email or password is incorrect"
+  /accounts/refresh-token:
+    post:
+      summary: Use a refresh token to generate a new JWT token and a new refresh token
+      description: The refresh token is sent and returned via cookies.
+      operationId: refreshToken
+      parameters:
+        - in: cookie
+          name: refreshToken
+          description: The `refreshToken` cookie
+          schema:
+            type: string
+            example: 51872eca5efedcf424db4cf5afd16a9d00ad25b743a034c9c221afc85d18dcd5e4ad6e3f08607550
+      responses:
+        "200":
+          description: Account details, a JWT access token and a new refresh token cookie
+          headers:
+            Set-Cookie:
+              description: "`refreshToken`"
+              schema:
+                type: string
+                example: refreshToken=51872eca5efedcf424db4cf5afd16a9d00ad25b743a034c9c221afc85d18dcd5e4ad6e3f08607550; Path=/; Expires=Tue, 16 Jun 2020 09:14:17 GMT; HttpOnly
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "5eb12e197e06a76ccdefc121"
+                  title:
+                    type: string
+                    example: "Mr"
+                  firstName:
+                    type: string
+                    example: "Jason"
+                  lastName:
+                    type: string
+                    example: "Watmore"
+                  email:
+                    type: string
+                    example: "jason@example.com"
+                  role:
+                    type: string
+                    example: "Admin"
+                  created:
+                    type: string
+                    example: "2020-05-05T09:12:57.848Z"
+                  isVerified:
+                    type: boolean
+                    example: true
+                  jwtToken:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWIxMmUxOTdlMDZhNzZjY2RlZmMxMjEiLCJpZCI6IjVlYjEyZTE5N2UwNmE3NmNjZGVmYzEyMSIsImlhdCI6MTU4ODc1ODE1N30.xR9H0STbFOpSkuGA9jHNZOJ6eS7umHHqKRhI807YT1Y"
+        "400":
+          description: The email or password is incorrect
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Email or password is incorrect"
+  /accounts/revoke-token:
+    post:
+      summary: Revoke a refresh token
+      description: Admin users can revoke the tokens of any account, regular users can only revoke their own tokens.
+      operationId: revokeToken
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: cookie
+          name: refreshToken
+          description: The refresh token can be sent in a cookie or the post body, if both are sent the token in the body is used.
+          schema:
+            type: string
+            example: 51872eca5efedcf424db4cf5afd16a9d00ad25b743a034c9c221afc85d18dcd5e4ad6e3f08607550
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  example: "51872eca5efedcf424db4cf5afd16a9d00ad25b743a034c9c221afc85d18dcd5e4ad6e3f08607550"
+      responses:
+        "200":
+          description: The refresh token was successfully revoked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Token revoked"
+        "400":
+          description: The refresh token is invalid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid token"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
   /accounts/register:
     post:
       summary: Register a new user account and send a verification email
@@ -304,10 +422,10 @@ paths:
                     role:
                       type: string
                       example: "Admin"
-                    dateCreated:
+                    created:
                       type: string
                       example: "2020-05-05T09:12:57.848Z"
-                    dateUpdated:
+                    updated:
                       type: string
                       example: "2020-05-08T03:11:21.553Z"
         "401":
@@ -380,7 +498,7 @@ paths:
                   role:
                     type: string
                     example: "Admin"
-                  dateCreated:
+                  created:
                     type: string
                     example: "2020-05-05T09:12:57.848Z"
         "400":
@@ -436,10 +554,10 @@ paths:
                   role:
                     type: string
                     example: "Admin"
-                  dateCreated:
+                  created:
                     type: string
                     example: "2020-05-05T09:12:57.848Z"
-                  dateUpdated:
+                  updated:
                     type: string
                     example: "2020-05-08T03:11:21.553Z"
         "404":
@@ -506,10 +624,10 @@ paths:
                   role:
                     type: string
                     example: "Admin"
-                  dateCreated:
+                  created:
                     type: string
                     example: "2020-05-05T09:12:57.848Z"
-                  dateUpdated:
+                  updated:
                     type: string
                     example: "2020-05-08T03:11:21.553Z"
         "404":
@@ -554,7 +672,7 @@ components:
             properties:
               message:
                 type: string
-                example: "Invalid Token"
+                example: "Unauthorized"
     NotFoundError:
       description: Not Found
       content:
