@@ -1,25 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const refreshTokenSchema = new Schema({
-    token: String,
-    expires: Date,
-    created: { type: Date, default: Date.now },
-    createdByIp: String,
-    revoked: Date,
-    revokedByIp: String,
-    replacedByToken: String
-});
-
-refreshTokenSchema.virtual('isExpired').get(function () {
-    return Date.now() >= this.expires;
-});
-
-refreshTokenSchema.virtual('isActive').get(function () {
-    return !this.revoked && !this.isExpired;
-});
-
-const accountSchema = new Schema({
+const schema = new Schema({
     email: { type: String, unique: true, required: true },
     passwordHash: { type: String, required: true },
     title: { type: String, required: true },
@@ -35,15 +17,14 @@ const accountSchema = new Schema({
     },
     passwordReset: Date,
     created: { type: Date, default: Date.now },
-    updated: Date,
-    refreshTokens: [refreshTokenSchema]
+    updated: Date
 });
 
-accountSchema.virtual('isVerified').get(function () {
+schema.virtual('isVerified').get(function () {
     return !!(this.verified || this.passwordReset);
 });
 
-accountSchema.set('toJSON', {
+schema.set('toJSON', {
     virtuals: true,
     versionKey: false,
     transform: function (doc, ret) {
@@ -53,4 +34,4 @@ accountSchema.set('toJSON', {
     }
 });
 
-module.exports = mongoose.model('Account', accountSchema);
+module.exports = mongoose.model('Account', schema);
