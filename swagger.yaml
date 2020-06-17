@@ -135,7 +135,7 @@ paths:
                     type: string
                     example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWIxMmUxOTdlMDZhNzZjY2RlZmMxMjEiLCJpZCI6IjVlYjEyZTE5N2UwNmE3NmNjZGVmYzEyMSIsImlhdCI6MTU4ODc1ODE1N30.xR9H0STbFOpSkuGA9jHNZOJ6eS7umHHqKRhI807YT1Y"
         "400":
-          description: The email or password is incorrect
+          description: The refresh token is invalid, revoked or expired
           content:
             application/json:
               schema:
@@ -143,7 +143,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Email or password is incorrect"
+                    example: "Invalid token"
   /accounts/revoke-token:
     post:
       summary: Revoke a refresh token
