@@ -126,7 +126,7 @@ function validateResetTokenSchema(req, res, next) {
     const schema = Joi.object({
         token: Joi.string().required()
     });
-    validateRequest(req, next, schema);        
+    validateRequest(req, next, schema);
 }
 
 function validateResetToken(req, res, next) {
@@ -195,7 +195,7 @@ function updateSchema(req, res, next) {
         password: Joi.string().min(6).empty(''),
         confirmPassword: Joi.string().valid(Joi.ref('password')).empty('')
     };
-    
+
     // only admins can update role
     if (req.user.role === Role.Admin) {
         schemaRules.role = Joi.string().valid(Role.Admin, Role.User).empty('');
@@ -229,8 +229,7 @@ function _delete(req, res, next) {
 
 // helper functions
 
-function setTokenCookie(res, token)
-{
+function setTokenCookie(res, token) {
     // create cookie with refresh token that expires in 7 days
     const cookieOptions = {
         httpOnly: true,

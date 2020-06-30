@@ -37,7 +37,7 @@ async function authenticate({ email, password, ipAddress }) {
     await refreshToken.save();
 
     // return basic details and tokens
-    return { 
+    return {
         ...basicDetails(account),
         jwtToken,
         refreshToken: refreshToken.token
@@ -60,7 +60,7 @@ async function refreshToken({ token, ipAddress }) {
     const jwtToken = generateJwtToken(account);
 
     // return basic details and tokens
-    return { 
+    return {
         ...basicDetails(account),
         jwtToken,
         refreshToken: newRefreshToken.token
@@ -105,9 +105,9 @@ async function register(params, origin) {
 
 async function verifyEmail({ token }) {
     const account = await db.Account.findOne({ verificationToken: token });
-    
+
     if (!account) throw 'Verification failed';
-    
+
     account.verified = Date.now();
     account.verificationToken = undefined;
     await account.save();
@@ -115,10 +115,10 @@ async function verifyEmail({ token }) {
 
 async function forgotPassword({ email }, origin) {
     const account = await db.Account.findOne({ email });
-    
+
     // always return ok response to prevent email enumeration
     if (!account) return;
-    
+
     // create reset token that expires after 24 hours
     account.resetToken = {
         token: randomTokenString(),
@@ -135,21 +135,21 @@ async function validateResetToken({ token }) {
         'resetToken.token': token,
         'resetToken.expires': { $gt: Date.now() }
     });
-    
+
     if (!account) throw 'Invalid token';
 }
 
 async function resetPassword({ token, password }) {
-    const account = await db.Account.findOne({ 
+    const account = await db.Account.findOne({
         'resetToken.token': token,
         'resetToken.expires': { $gt: Date.now() }
     });
-    
+
     if (!account) throw 'Invalid token';
-    
+
     // update password and remove reset token
     account.passwordHash = hash(password);
-    account.passwordReset =  Date.now();
+    account.passwordReset = Date.now();
     account.resetToken = undefined;
     await account.save();
 }

@@ -11,7 +11,7 @@ const schema = new Schema({
     role: { type: String, required: true },
     verificationToken: String,
     verified: Date,
-    resetToken: { 
+    resetToken: {
         token: String,
         expires: Date
     },
