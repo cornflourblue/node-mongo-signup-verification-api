@@ -92,9 +92,7 @@ async function register(params, origin) {
     account.verificationToken = randomTokenString();
 
     // hash password
-    if (params.password) {
-        account.passwordHash = hash(params.password);
-    }
+    account.passwordHash = hash(params.password);
 
     // save account
     await account.save();
@@ -174,9 +172,7 @@ async function create(params) {
     account.verified = Date.now();
 
     // hash password
-    if (params.password) {
-        account.passwordHash = hash(params.password);
-    }
+    account.passwordHash = hash(params.password);
 
     // save account
     await account.save();
