@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const sendEmail = require('_helpers/send-email');
 const db = require('_helpers/db');
 const Role = require('_helpers/role');
+const utilitiesService = require('utilities/utilities.service');
 
 module.exports = {
     authenticate,
@@ -77,6 +78,17 @@ async function revokeToken({ token, ipAddress }) {
 }
 
 async function register(params, origin) {
+    const utility = await db.Utilities.findOne({name: 'Registration'});
+
+    if(!utility) {
+        utilitiesService.create({
+            name: 'Registration',
+            status: true
+        });
+    }
+
+    if(!utility.isActive) throw 'We are not able to process your request. Please try again later.';
+    
     // validate
     if (await db.Account.findOne({ email: params.email })) {
         // send already registered error in email to prevent account enumeration
