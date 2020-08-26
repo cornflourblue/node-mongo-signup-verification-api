@@ -85,9 +85,9 @@ async function register(params, origin) {
             name: 'Registration',
             status: true
         });
+    } else if (utility && !utility.isActive) {
+        throw 'We are not able to process your request. Please try again later.';
     }
-
-    if(!utility.isActive) throw 'We are not able to process your request. Please try again later.';
     
     // validate
     if (await db.Account.findOne({ email: params.email })) {
