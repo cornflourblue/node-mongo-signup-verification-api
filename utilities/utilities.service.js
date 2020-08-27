@@ -50,23 +50,23 @@ async function create(params) {
         throw 'Utility "' + params.name + '" already exists';
     }
 
-    const utilities = new db.Utilities();
-    utilities.name = params.name;
-    utilities.status = params.status;
-    utilities.modified = Date.now();
-    await utilities.save();
+    const utility = new db.Utilities();
+    utility.name = params.name;
+    utility.status = params.status;
+    utility.modified = Date.now();
+    await utility.save();
+    return utilityDetails(utility);
 }
 
 async function update(id, params) {
+    const utility = await getUtility(id);
+
     // validate
-    const utilities = await db.Utilities.findOne({ name: params.name })    
-    if (utilities && utilities.id != id) {
+    if (utility.name !== params.name && await db.Utilities.findOne({ name: params.name })) {
         throw 'Utility "' + params.name + '" already exists';
     }
 
-    const utility = await getUtility(id);
-
-    // copy params to account and save
+    // copy params to utility and save
     Object.assign(utility, params);
     utility.modified = Date.now();
     await utility.save();

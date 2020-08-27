@@ -58,7 +58,7 @@ function createSchema(req, res, next) {
 
 function create(req, res, next) {
     utilitiesService.create(req.body)
-        .then(() => res.json({ message: 'Utility created.' }))
+        .then(utility => res.json(utility))
         .catch(next);
 }
 
