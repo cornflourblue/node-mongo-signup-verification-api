@@ -64,7 +64,8 @@ function create(req, res, next) {
 
 function updateSchema(req, res, next) {
     const schemaRules = {
-        name: Joi.string().empty('')
+        name: Joi.string().empty(''),
+        status: Joi.boolean().empty('')
     };
 
     const schema = Joi.object(schemaRules);

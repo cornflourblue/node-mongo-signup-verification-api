@@ -58,8 +58,9 @@ async function create(params) {
 }
 
 async function update(id, params) {
-    // validate    
-    if (await db.Utilities.findOne({ name: params.name })) {
+    // validate
+    const utilities = await db.Utilities.findOne({ name: params.name })    
+    if (utilities && utilities.id != id) {
         throw 'Utility "' + params.name + '" already exists';
     }
 
