@@ -655,6 +655,194 @@ paths:
           $ref: "#/components/responses/NotFoundError"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+  /utilities:
+    get:
+      summary: Get a list of all utilities
+      description: Restricted to admin users.
+      operationId: getAllUtilities
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: An array of all utilities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: "5f4687b680c1510c4c46b7d3"
+                    name:
+                      type: string
+                      example: "Example"
+                    status:
+                      type: boolean
+                      example: true
+                    modified:
+                      type: string
+                      example: "2020-05-08T03:11:21.553Z"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    post:
+      summary: Create a new utility
+      description: Restricted to admin users.
+      operationId: createUtility
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Example"
+                status:
+                  type: boolean
+                  example: true
+              required:
+                - name
+                - status
+      responses:
+        "200":
+          description: Utility created successfully. The details of the new utility are returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                  properties:
+                    id:
+                      type: string
+                      example: "5f4687b680c1510c4c46b7d3"
+                    name:
+                      type: string
+                      example: "Example"
+                    status:
+                      type: boolean
+                      example: true
+                    modified:
+                      type: string
+                      example: "2020-05-08T03:11:21.553Z"
+        "400":
+          description: Utility already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Utility 'Example' already exists"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+  /utilities/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: Utility id
+        required: true
+        example: "5f4687b680c1510c4c46b7d3"
+        schema:
+          type: string
+    get:
+      summary: Get a single utility by id
+      description: Restricted to admin users.
+      operationId: getUtilityById
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Details of the specified utility
+          content:
+            application/json:
+              schema:
+                type: object
+                  properties:
+                    id:
+                      type: string
+                      example: "5f4687b680c1510c4c46b7d3"
+                    name:
+                      type: string
+                      example: "Example"
+                    status:
+                      type: boolean
+                      example: true
+                    modified:
+                      type: string
+                      example: "2020-05-08T03:11:21.553Z"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    put:
+      summary: Update a utility
+      description: Restricted to admin users.
+      operationId: updateUtility
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Example"
+                status:
+                  type: boolean
+                  example: true
+      responses:
+        "200":
+          description: Utility updated successfully. The details of the updated utility are returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                    id:
+                      type: string
+                      example: "5f4687b680c1510c4c46b7d3"
+                    name:
+                      type: string
+                      example: "Example"
+                    status:
+                      type: boolean
+                      example: true
+                    modified:
+                      type: string
+                      example: "2020-05-08T03:11:21.553Z"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    delete:
+      summary: Delete a utility
+      description: Restricted to admin users.
+      operationId: deleteUtility
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Utility deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Utility deleted successfully"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
 components:
   securitySchemes:
