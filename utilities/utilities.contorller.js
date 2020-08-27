@@ -9,30 +9,23 @@ const validateRequest = require('_middleware/validate-request');
 module.exports = router;
 
 // routes
-router.post('/enable', authorize(Role.Admin), toggleSchema, enable);
-router.post('/disable', authorize(Role.Admin), toggleSchema, disable);
+router.post('/enable/:id', authorize(Role.Admin), enable);
+router.post('/disable/:id', authorize(Role.Admin), disable);
 router.get('/', authorize(Role.Admin), getAll);
 router.get('/:id', authorize(Role.Admin), getById);
 router.post('/', authorize(Role.Admin), createSchema, create);
 router.put('/:id', authorize(Role.Admin), updateSchema, update);
 router.delete('/:id', authorize(Role.Admin), _delete);
 
-function toggleSchema(req, res, next) {
-    const schema = Joi.object({
-        name: Joi.string().required()
-    });
-    validateRequest(req, next, schema);
-}
-
 function enable(req, res, next) {
-    utilitiesService.enable(req.body)
-        .then(() => res.json({ message: 'Utility enabled.' }))
+    utilitiesService.enable(req.params.id)
+        .then(() => res.json({ message: 'Utility enabled' }))
         .catch(next);
 }
 
 function disable(req, res, next) {
-    utilitiesService.disable(req.body)
-        .then(() => res.json({ message: 'Utility disabled.' }))
+    utilitiesService.disable(req.params.id)
+        .then(() => res.json({ message: 'Utility disabled' }))
         .catch(next);
 }
 

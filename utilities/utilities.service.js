@@ -10,28 +10,18 @@ module.exports = {
     delete: _delete
 };
 
-async function enable(params){
-    const utilities = await db.Utilities.findOne({name: params.name});
-
-    if (!utilities) throw 'Invalid request';
-
-    if (!utilities.isActive) {
-        utilities.status = true;
-        utilities.modified = Date.now();
-        await utilities.save();
-    }
+async function enable(id){
+    const utility = await getUtility(id);
+    utility.status = true;
+    utility.modified = Date.now();
+    await utility.save();
 }
 
-async function disable(params){
-    const utilities = await db.Utilities.findOne({name: params.name});
-
-    if (!utilities) throw 'Invalid request';
-
-    if (utilities.isActive) {
-        utilities.status = false;
-        utilities.modified = Date.now();
-        await utilities.save();
-    }
+async function disable(id){
+    const utility = await getUtility(id);
+    utility.status = false;
+    utility.modified = Date.now();
+    await utility.save();
 }
 
 async function getAll() {

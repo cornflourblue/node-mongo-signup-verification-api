@@ -655,6 +655,81 @@ paths:
           $ref: "#/components/responses/NotFoundError"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+
+  /utilities/enable/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: Utility id
+        required: true
+        example: "5f47bf56f9893d3eb89e698a"
+        schema:
+          type: string
+    post:
+      summary: Enable a utility
+      description: Restricted to admin users.
+      operationId: enableUtility
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Utility enabled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Utility enabled"
+        
+        "404":
+          description: Utility not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Utility not found"
+  /utilities/disable/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: Utility id
+        required: true
+        example: "5f47bf56f9893d3eb89e698a"
+        schema:
+          type: string
+    post:
+      summary: Disable a utility
+      description: Restricted to admin users.
+      operationId: disableUtility
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Utility disabled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Utility disabled"
+        
+        "404":
+          description: Utility not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Utility not found"
   /utilities:
     get:
       summary: Get a list of all utilities
@@ -674,7 +749,7 @@ paths:
                   properties:
                     id:
                       type: string
-                      example: "5f4687b680c1510c4c46b7d3"
+                      example: "5f47bf56f9893d3eb89e698a"
                     name:
                       type: string
                       example: "Example"
@@ -683,7 +758,7 @@ paths:
                       example: true
                     modified:
                       type: string
-                      example: "2020-05-08T03:11:21.553Z"
+                      example: "2020-08-27T14:12:38.094Z"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
     post:
@@ -710,26 +785,26 @@ paths:
                 - status
       responses:
         "200":
-          description: Utility created successfully. The details of the new utility are returned.
+          description: Utility created successfully. The details of the new utility is returned.
           content:
             application/json:
               schema:
                 type: object
-                  properties:
-                    id:
-                      type: string
-                      example: "5f4687b680c1510c4c46b7d3"
-                    name:
-                      type: string
-                      example: "Example"
-                    status:
-                      type: boolean
-                      example: true
-                    modified:
-                      type: string
-                      example: "2020-05-08T03:11:21.553Z"
+                properties:
+                  id:
+                    type: string
+                    example: "5f47bf56f9893d3eb89e698a"
+                  name:
+                    type: string
+                    example: "Example"
+                  status:
+                    type: boolean
+                    example: true
+                  modified:
+                    type: string
+                    example: "2020-08-27T14:12:38.094Z"
         "400":
-          description: Utility already exists
+          description: Utility is already exists
           content:
             application/json:
               schema:
@@ -737,7 +812,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Utility 'Example' already exists"
+                    example: "Utility 'Example' is already exists"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
   /utilities/{id}:
@@ -746,7 +821,7 @@ paths:
         name: id
         description: Utility id
         required: true
-        example: "5f4687b680c1510c4c46b7d3"
+        example: "5f47bf56f9893d3eb89e698a"
         schema:
           type: string
     get:
@@ -762,19 +837,19 @@ paths:
             application/json:
               schema:
                 type: object
-                  properties:
-                    id:
-                      type: string
-                      example: "5f4687b680c1510c4c46b7d3"
-                    name:
-                      type: string
-                      example: "Example"
-                    status:
-                      type: boolean
-                      example: true
-                    modified:
-                      type: string
-                      example: "2020-05-08T03:11:21.553Z"
+                properties:
+                  id:
+                    type: string
+                    example: "5f47bf56f9893d3eb89e698a"
+                  name:
+                    type: string
+                    example: "Example"
+                  status:
+                    type: boolean
+                    example: true
+                  modified:
+                    type: string
+                    example: "2020-08-27T14:12:38.094Z"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "401":
@@ -800,24 +875,24 @@ paths:
                   example: true
       responses:
         "200":
-          description: Utility updated successfully. The details of the updated utility are returned.
+          description: Utility updated successfully. The details of the updated utility is returned.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                    id:
-                      type: string
-                      example: "5f4687b680c1510c4c46b7d3"
-                    name:
-                      type: string
-                      example: "Example"
-                    status:
-                      type: boolean
-                      example: true
-                    modified:
-                      type: string
-                      example: "2020-05-08T03:11:21.553Z"
+                  id:
+                    type: string
+                    example: "5f47bf56f9893d3eb89e698a"
+                  name:
+                    type: string
+                    example: "Example"
+                  status:
+                    type: boolean
+                    example: true
+                  modified:
+                    type: string
+                    example: "2020-08-27T14:12:38.094Z"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "401":
