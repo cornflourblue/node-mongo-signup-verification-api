@@ -183,8 +183,8 @@ async function create(params) {
 async function update(id, params) {
     const account = await getAccount(id);
 
-    // validate
-    if (account.email !== params.email && await db.Account.findOne({ email: params.email })) {
+    // validate (if email was changed)
+    if (params.email && account.email !== params.email && await db.Account.findOne({ email: params.email })) {
         throw 'Email "' + params.email + '" is already taken';
     }
 
