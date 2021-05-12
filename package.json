@@ -22,7 +22,7 @@
         "jsonwebtoken": "^8.5.1",
         "mongodb": "^3.5.7",
         "mongoose": "^5.9.25",
-        "nodemailer": "^6.4.6",
+        "nodemailer": "^6.4.16",
         "rootpath": "^0.1.2",
         "swagger-ui-express": "^4.1.4",
         "yamljs": "^0.3.0"
