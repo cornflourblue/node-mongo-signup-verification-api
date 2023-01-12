@@ -104,11 +104,16 @@ async function register(params, origin) {
 async function verifyEmail({ token }) {
     const account = await db.Account.findOne({ verificationToken: token });
 
-    if (!account) throw 'Verification failed';
-
-    account.verified = Date.now();
-    account.verificationToken = undefined;
-    await account.save();
+    //if (!account) throw 'Verification failed';
+    if (!account) {
+        return ({result:"Verification Failed - email has not registered"})
+    }
+    else {
+        account.verified = Date.now();
+        account.verificationToken = token;
+        await account.save();
+        return ({message:"Verification Completed - please log in to continue"})
+    }
 }
 
 async function forgotPassword({ email }, origin) {
@@ -120,7 +125,7 @@ async function forgotPassword({ email }, origin) {
     // create reset token that expires after 24 hours
     account.resetToken = {
         token: randomTokenString(),
-        expires: new Date(Date.now() + 24*60*60*1000)
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000)
     };
     await account.save();
 
@@ -235,7 +240,7 @@ function generateRefreshToken(account, ipAddress) {
     return new db.RefreshToken({
         account: account.id,
         token: randomTokenString(),
-        expires: new Date(Date.now() + 7*24*60*60*1000),
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         createdByIp: ipAddress
     });
 }
@@ -252,7 +257,7 @@ function basicDetails(account) {
 async function sendVerificationEmail(account, origin) {
     let message;
     if (origin) {
-        const verifyUrl = `${origin}/account/verify-email?token=${account.verificationToken}`;
+        const verifyUrl = `${origin}/verify-email-response?token=${account.verificationToken}`;
         message = `<p>Please click the below link to verify your email address:</p>
                    <p><a href="${verifyUrl}">${verifyUrl}</a></p>`;
     } else {
@@ -262,7 +267,7 @@ async function sendVerificationEmail(account, origin) {
 
     await sendEmail({
         to: account.email,
-        subject: 'Sign-up Verification API - Verify Email',
+        subject: 'PayInCrypto Signup - Verify Email',
         html: `<h4>Verify Email</h4>
                <p>Thanks for registering!</p>
                ${message}`
@@ -272,14 +277,14 @@ async function sendVerificationEmail(account, origin) {
 async function sendAlreadyRegisteredEmail(email, origin) {
     let message;
     if (origin) {
-        message = `<p>If you don't know your password please visit the <a href="${origin}/account/forgot-password">forgot password</a> page.</p>`;
+        message = `<p>If you don't know your password please visit the <a href="${origin}/api/forgot-password">forgot password</a> page.</p>`;
     } else {
-        message = `<p>If you don't know your password you can reset it via the <code>/account/forgot-password</code> api route.</p>`;
+        message = `<p>If you don't know your password you can reset it via the <code>/api/forgot-password</code> api route.</p>`;
     }
 
     await sendEmail({
         to: email,
-        subject: 'Sign-up Verification API - Email Already Registered',
+        subject: 'PayInCrypto Signup - Email Already Registered',
         html: `<h4>Email Already Registered</h4>
                <p>Your email <strong>${email}</strong> is already registered.</p>
                ${message}`
@@ -289,7 +294,7 @@ async function sendAlreadyRegisteredEmail(email, origin) {
 async function sendPasswordResetEmail(account, origin) {
     let message;
     if (origin) {
-        const resetUrl = `${origin}/account/reset-password?token=${account.resetToken.token}`;
+        const resetUrl = `${origin}/api/reset-password?token=${account.resetToken.token}`;
         message = `<p>Please click the below link to reset your password, the link will be valid for 1 day:</p>
                    <p><a href="${resetUrl}">${resetUrl}</a></p>`;
     } else {
@@ -299,7 +304,7 @@ async function sendPasswordResetEmail(account, origin) {
 
     await sendEmail({
         to: account.email,
-        subject: 'Sign-up Verification API - Reset Password',
+        subject: 'PayInCrypto Signup - Reset Password',
         html: `<h4>Reset Password Email</h4>
                ${message}`
     });

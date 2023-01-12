@@ -34,7 +34,8 @@ function authenticateSchema(req, res, next) {
 function authenticate(req, res, next) {
     const { email, password } = req.body;
     const ipAddress = req.ip;
-    accountService.authenticate({ email, password, ipAddress })
+    //accountService.authenticate({ email, password, registerSchemaipAddress })
+    accountService.authenticate({ email, password })
         .then(({ refreshToken, ...account }) => {
             setTokenCookie(res, refreshToken);
             res.json(account);
@@ -79,22 +80,24 @@ function revokeToken(req, res, next) {
 
 function registerSchema(req, res, next) {
     const schema = Joi.object({
-        title: Joi.string().required(),
-        firstName: Joi.string().required(),
-        lastName: Joi.string().required(),
+        // title: Joi.string().required(),
+        // firstName: Joi.string().required(),
+        // lastName: Joi.string().required(),
         email: Joi.string().email().required(),
         password: Joi.string().min(6).required(),
         confirmPassword: Joi.string().valid(Joi.ref('password')).required(),
-        acceptTerms: Joi.boolean().valid(true).required()
+        // acceptTerms: Joi.boolean().valid(true).required()
     });
     validateRequest(req, next, schema);
 }
 
 function register(req, res, next) {
+    var s = req.get('origin')
     accountService.register(req.body, req.get('origin'))
         .then(() => res.json({ message: 'Registration successful, please check your email for verification instructions' }))
         .catch(next);
 }
+
 
 function verifyEmailSchema(req, res, next) {
     const schema = Joi.object({
@@ -103,10 +106,11 @@ function verifyEmailSchema(req, res, next) {
     validateRequest(req, next, schema);
 }
 
-function verifyEmail(req, res, next) {
-    accountService.verifyEmail(req.body)
-        .then(() => res.json({ message: 'Verification successful, you can now login' }))
-        .catch(next);
+async function verifyEmail(req, res, next) {
+
+    const r = await accountService.verifyEmail(req.body, req.get('origin'))
+    .then((r) => res.json(r))
+    
 }
 
 function forgotPasswordSchema(req, res, next) {
