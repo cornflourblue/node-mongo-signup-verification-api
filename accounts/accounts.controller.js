@@ -70,7 +70,7 @@ function revokeToken(req, res, next) {
 
     // users can revoke their own tokens and admins can revoke any tokens
     if (!req.user.ownsToken(token) && req.user.role !== Role.Admin) {
-        return res.status(401).json({ message: 'Unauthorized' });
+        return res.status(401).json({ message: 'Unauthorizeddd' });
     }
 
     accountService.revokeToken({ token, ipAddress })
@@ -106,9 +106,9 @@ function verifyEmailSchema(req, res, next) {
     validateRequest(req, next, schema);
 }
 
-async function verifyEmail(req, res, next) {
+function verifyEmail(req, res, next) {
 
-    const r = await accountService.verifyEmail(req.body, req.get('origin'))
+    const r = accountService.verifyEmail(req.body, req.get('origin'))
     .then((r) => res.json(r))
     
 }
